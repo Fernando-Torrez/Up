@@ -117,29 +117,35 @@
     color: #2b1a0e; flex-shrink: 0;
   }
 
-  /* --- PORTADA PRINCIPAL PERSONALIZADA --- */
+  /* --- PORTADA PRINCIPAL DISEÑO FLUIDO SIN ESPACIOS --- */
   .cover-content {
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    position: relative;
+    display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
     height: 100%; text-align: center; background: var(--leather-base);
     box-shadow: inset 0 0 50px rgba(0,0,0,0.6); width: 100%; border-radius: 4px;
+    padding-bottom: 50px; /* Margen inferior para los textos del pie */
   }
   .cover-title {
     font-family: 'Cabin Sketch', cursive; font-size: clamp(38px, 4.8vw, 64px);
     color: #fcefd2; margin: 0; text-shadow: 3px 4px 0px #1d0f07; letter-spacing: 2px;
+    z-index: 3;
   }
   .cover-subtitle {
-    color: #ffd27d; font-family: 'Cabin Sketch', cursive; font-size: 28px; margin: 5px 0 0 0; text-shadow: 1px 2px 0px #1d0f07;
+    color: #ffd27d; font-family: 'Cabin Sketch', cursive; font-size: 28px; margin: 8px 0 0 0; text-shadow: 1px 2px 0px #1d0f07;
+    z-index: 3;
   }
   
-  /* --- CHAPA GRAPE SODA AGRANDADA --- */
+  /* --- CHAPA GRAPE SODA ABSOLUTA (NO EMPUJA NADA) --- */
   .soda-badge-img {
-    width: 260px; /* Tamaño significativamente mayor y vistoso */
+    position: absolute;
+    top: 15%; /* Centrado vertical optimizado arriba de los textos */
+    width: 260px;
     height: 260px;
     object-fit: contain;
-    margin-bottom: 5px;
     cursor: pointer;
-    filter: drop-shadow(0px 15px 22px rgba(0, 0, 0, 0.55)) contrast(1.05) brightness(1.02);
+    filter: drop-shadow(0px 15px 22px rgba(0, 0, 0, 0.6)) contrast(1.05) brightness(1.02);
     transition: transform 0.2s ease;
+    z-index: 2;
   }
 
   /* --- CONTADOR --- */
@@ -181,7 +187,7 @@
           <img src="https://elpingo.com/wp-content/uploads/2023/03/grape-soda-up.png" alt="Grape Soda Pin" class="soda-badge-img" id="special-badge-click" />
           <h2 class="cover-title">Nuestro Libro de Aventuras</h2>
           <h3 class="cover-subtitle">Mel & Fer</h3>
-          <p style="color: #dac7ad; font-size: 15px; margin-top: 20px;">Pasa las páginas usando los botones inferiores</p>
+          <p style="color: #dac7ad; font-size: 15px; margin: 20px 0 0 0; z-index: 3;">Pasa las páginas usando los botones inferiores</p>
         </div>
       </div>
 
@@ -267,7 +273,7 @@
       </div>
 
       <div class="page hard" style="background: var(--leather-dark); justify-content: center;">
-        <div class="cover-content">
+        <div class="cover-content" style="padding-bottom: 0; justify-content: center;">
           <i class="fa-solid fa-heart" style="font-size: 55px; color: #e74c3c; margin-bottom: 15px;"></i>
           <h3 style="font-family:'Cabin Sketch', cursive; font-size: 36px; color: #fcefd2; margin: 0;">¡La aventura está ahí afuera!</h3>
           <p style="color: #dac7ad; font-size: 15px; margin-top: 10px;">Mel & Fer — Cap. Uno</p>

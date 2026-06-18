@@ -1,391 +1,321 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nuestra Mayor Aventura — Carl & Ellie</title>
 
-<title>Nuestra Aventura ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@700&family=Inter:wght@300;400;600&family=Short+Stack&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
 <style>
+  :root {
+    --bg-sky-top: #bbf2f6;
+    --bg-sky-bottom: #86e3ce;
+    --paper-bg: #fcf8f2;
+    --leather-brown: #5c3a21;
+    --grape-purple: #6a3d73;
+    --text-dark: #2c2520;
+    --shadow: 0 12px 35px rgba(0,0,0,0.15);
+  }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+    background: linear-gradient(180deg, var(--bg-sky-top) 0%, var(--bg-sky-bottom) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+  }
 
-body{
-font-family:'Poppins',sans-serif;
-overflow-x:hidden;
-background:linear-gradient(
-180deg,
-#0b1020,
-#1a2340,
-#253c7b
-);
-color:white;
-}
+  /* Nubes de fondo */
+  .clouds { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .cloud {
+    position: absolute; background: white; border-radius: 100px; opacity: 0.6;
+    filter: blur(2px);
+  }
+  .cloud::before, .cloud::after {
+    content: ''; position: absolute; background: white; border-radius: 50%;
+  }
 
-.hero{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-position:relative;
-overflow:hidden;
-}
+  /* Contenedor del Cielo (Globos flotantes) */
+  #sky-canvas {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  }
 
-h1{
-font-size:5rem;
-font-family:'Dancing Script',cursive;
-animation:fadeUp 2s ease;
-}
+  /* Tarjeta / Libro de Aventuras Principal */
+  .adventure-book {
+    position: relative; z-index: 3;
+    width: min(550px, 90vw);
+    background: var(--paper-bg);
+    border: 8px solid var(--leather-brown);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 30px;
+    text-align: center;
+    transform: scale(0.9);
+    opacity: 0;
+  }
 
-.subtitle{
-margin-top:20px;
-font-size:1.3rem;
-max-width:700px;
-opacity:.9;
-animation:fadeUp 3s ease;
-}
+  /* Textura de papel antiguo para el libro */
+  .adventure-book::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0);
+    background-size: 24px 24px;
+    pointer-events: none; border-radius: 8px;
+  }
 
-.btn{
-margin-top:40px;
-padding:15px 35px;
-border:none;
-border-radius:50px;
-font-size:1.1rem;
-cursor:pointer;
-background:white;
-color:#253c7b;
-font-weight:bold;
-transition:.4s;
-}
+  /* Chapa de Grape Soda */
+  .badge-container {
+    position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 80px; z-index: 4; cursor: pointer;
+  }
+  .grape-badge {
+    width: 100%; height: 100%; background: #c3c3c3;
+    border-radius: 50%; border: 4px dashed #7a7a7a;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2), inset 0 0 10px rgba(0,0,0,0.2);
+    display: flex; justify-content: center; align-items: center;
+    position: relative;
+  }
+  .grape-badge::after {
+    content: 'GRAPE\nSODA';
+    white-space: pre-line; font-family: 'Cabin Sketch', cursive;
+    font-size: 11px; font-weight: bold; color: white;
+    background: var(--grape-purple); padding: 8px; border-radius: 50%;
+    text-align: center; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .safety-pin {
+    position: absolute; top: -10px; left: 15px; font-size: 24px; color: #555;
+    transform: rotate(35deg);
+  }
 
-.btn:hover{
-transform:scale(1.08);
-}
+  /* Títulos y Frases */
+  .title {
+    font-family: 'Cabin Sketch', cursive; font-size: clamp(28px, 6vw, 42px);
+    margin: 20px 0 10px; color: var(--leather-brown);
+  }
+  
+  .quote-container {
+    min-height: 120px; display: flex; align-items: center; justify-content: center;
+    margin: 20px 0; font-family: 'Short Stack', cursive;
+    font-size: clamp(16px, 3.5vw, 22px); color: #4a3b32; line-height: 1.5;
+  }
 
-.stars{
-position:fixed;
-width:100%;
-height:100%;
-z-index:-3;
-}
+  /* Botones e Interacción */
+  .btn-next {
+    appearance: none; border: 0; border-radius: 25px;
+    padding: 12px 28px; font-family: 'Inter', sans-serif; font-weight: 600;
+    background: var(--grape-purple); color: white; font-size: 15px;
+    cursor: pointer; box-shadow: 0 4px 15px rgba(106,61,115,0.4);
+    transition: transform 0.2s, background 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-next:hover { transform: translateY(-2px); background: #54305c; }
+  .btn-next:active { transform: translateY(0); }
 
-.star{
-position:absolute;
-background:white;
-border-radius:50%;
-animation:twinkle 4s infinite;
-}
+  /* Estilos para los elementos voladores (Globos y Casa) */
+  .balloon {
+    position: absolute; bottom: -100px; width: 35px; height: 45px;
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    opacity: 0.85;
+  }
+  .balloon::after {
+    content: ""; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    border-left: 4px solid transparent; border-right: 4px solid transparent;
+    border-bottom: 6px solid rgba(0,0,0,0.2);
+  }
+  .balloon-string {
+    position: absolute; bottom: -36px; left: 50%; width: 1px; height: 30px;
+    background: rgba(255,255,255,0.5);
+  }
 
-.balloon{
-position:absolute;
-bottom:-200px;
-width:80px;
-animation:floatUp linear infinite;
-}
-
-.house{
-width:250px;
-margin-top:50px;
-animation:houseFloat 5s ease-in-out infinite;
-filter:drop-shadow(0 0 25px rgba(255,255,255,.3));
-}
-
-.section{
-padding:120px 10%;
-text-align:center;
-}
-
-.card{
-max-width:900px;
-margin:auto;
-background:rgba(255,255,255,.08);
-backdrop-filter:blur(10px);
-padding:50px;
-border-radius:25px;
-}
-
-.quote{
-font-size:2rem;
-font-family:'Dancing Script';
-margin-bottom:25px;
-}
-
-.timeline{
-display:grid;
-gap:25px;
-margin-top:50px;
-}
-
-.event{
-background:rgba(255,255,255,.08);
-padding:25px;
-border-radius:20px;
-transition:.4s;
-}
-
-.event:hover{
-transform:translateY(-8px);
-}
-
-footer{
-padding:80px;
-text-align:center;
-}
-
-.heart{
-position:fixed;
-pointer-events:none;
-animation:heartFloat 5s linear forwards;
-}
-
-@keyframes fadeUp{
-from{
-opacity:0;
-transform:translateY(50px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
-}
-
-@keyframes twinkle{
-50%{
-opacity:.2;
-}
-}
-
-@keyframes floatUp{
-from{
-transform:translateY(0);
-}
-to{
-transform:translateY(-130vh);
-}
-}
-
-@keyframes houseFloat{
-50%{
-transform:translateY(-20px);
-}
-}
-
-@keyframes heartFloat{
-to{
-transform:translateY(-300px);
-opacity:0;
-}
-}
-
+  .up-house {
+    position: absolute; font-size: 45px; color: #d96a6a; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15));
+    z-index: 2; pointer-events: none; bottom: -150px;
+  }
 </style>
 </head>
-
 <body>
 
-<div class="stars" id="stars"></div>
+  <div class="clouds" id="clouds-container"></div>
 
-<section class="hero">
+  <div id="sky-canvas"></div>
 
-<h1>Para Mi Chica Espacial ✨</h1>
+  <main class="adventure-book" id="book">
+    
+    <div class="badge-container" id="badge-trigger" title="¡Gracias por esta aventura!">
+      <i class="fa-solid fa-paperclip safety-pin"></i>
+      <div class="grape-badge"></div>
+    </div>
 
-<p class="subtitle">
-Hay personas que aparecen en tu vida...
-y hay personas que se convierten en tu aventura favorita.
-Tú eres ambas.
-</p>
+    <h1 class="title" id="book-title">Nuestro Libro de Aventuras</h1>
+    
+    <div class="quote-container">
+      <p id="quote-text">Cargando nuestra próxima parada...</p>
+    </div>
 
-<img
-class="house"
-src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800"
->
-
-<button class="btn" onclick="showMessage()">
-Abrir Mi Carta ❤️
-</button>
-
-</section>
-
-<section class="section">
-
-<div class="card">
-
-<div class="quote">
-"Si pudiera elegir cualquier destino del universo,
-seguiría eligiendo caminar a tu lado."
-</div>
-
-<p>
-No eres mi casualidad favorita.
-Eres la persona que convirtió días normales
-en recuerdos extraordinarios.
-</p>
-
-</div>
-
-</section>
-
-<section class="section">
-
-<h2>Nuestra Línea Del Tiempo 🚀</h2>
-
-<div class="timeline">
-
-<div class="event">
-🌟 El día que nos conocimos
-</div>
-
-<div class="event">
-☁️ La primera conversación que no quería terminar
-</div>
-
-<div class="event">
-🎈 El momento en que supe que eras especial
-</div>
-
-<div class="event">
-🚀 Nuestra próxima aventura
-</div>
-
-</div>
-
-</section>
-
-<section class="section">
-
-<div class="card">
-
-<h2>Razones Por Las Que Me Gustas</h2>
-
-<br>
-
-<p>
-❤️ Tu forma de sonreír
-</p>
-
-<br>
-
-<p>
-❤️ Tu manera de hacer que todo sea más bonito
-</p>
-
-<br>
-
-<p>
-❤️ Porque contigo hasta los silencios tienen sentido
-</p>
-
-<br>
-
-<p>
-❤️ Porque cada día encuentro una nueva razón
-</p>
-
-</div>
-
-</section>
-
-<footer>
-
-<h2>
-El universo es enorme...
-pero qué suerte que coincidimos.
-✨
-</h2>
-
-</footer>
+    <button class="btn-next" id="btn-advance">
+      <span>Siguiente página</span> <i class="fa-solid fa-compass animate-compass"></i>
+    </button>
+  </main>
 
 <script>
+  // Listado de frases inspiradas en la película
+  const upQuotes = [
+    "«Gracias por esta hermosa aventura... ¡Ahora te toca a ti vivir una nueva!» — Ellie",
+    "¿Sabes? Eres mi mayor aventura. No cambiaría nuestros kilómetros por nada del mundo.",
+    "«Quiero explorar el mundo contigo, desde las Cataratas del Paraíso hasta el rincón más pequeño.»",
+    "Estar contigo es como tener un pase de primera clase hacia el lugar más feliz que existe.",
+    "Tú y yo somos como Carl y Ellie... un equipo perfecto listo para cualquier viaje.",
+    "«Crucé el océano, tormentas y mil nubes solo para asegurarme de que estabas bien.»"
+  ];
 
-const stars = document.getElementById("stars");
+  // Paleta de colores pastel para los globos de helio
+  const balloonColors = ['#ff7675', '#74b9ff', '#ffeaa7', '#a29bfe', '#ff9ff3', '#55efc4', '#ffb142'];
+  
+  let currentQuoteIndex = 0;
+  const quoteText = document.getElementById('quote-text');
+  const btnAdvance = document.getElementById('btn-advance');
+  const skyCanvas = document.getElementById('sky-canvas');
 
-for(let i=0;i<200;i++){
+  // 1. Inicialización de la pantalla con GSAP
+  window.addEventListener('DOMContentLoaded', () => {
+    createClouds();
+    
+    // Animación de entrada para el libro
+    gsap.to("#book", {
+      opacity: 1, scale: 1, duration: 1.2, ease: "back.out(1.2)", delay: 0.5
+    });
 
-const star=document.createElement("div");
+    // Cambiar a la primera frase
+    updateQuote(false);
+    
+    // Lanzar ráfagas de globos continuas en el fondo
+    setInterval(spawnBalloon, 400);
+    // Lanzar la casa flotante de vez en cuando
+    setInterval(spawnHouse, 12000);
+    spawnHouse(); // Primera casa rápida
+  });
 
-star.className="star";
+  // 2. Lógica para cambiar de página (Frases) con animación tipo libro
+  function updateQuote(animate = true) {
+    if (animate) {
+      // Efecto flip/out temporal con GSAP
+      gsap.to(".quote-container", {
+        opacity: 0, y: -10, duration: 0.3, onComplete: () => {
+          quoteText.innerText = upQuotes[currentQuoteIndex];
+          gsap.to(".quote-container", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
+        }
+      });
+    } else {
+      quoteText.innerText = upQuotes[currentQuoteIndex];
+    }
+  }
 
-const size=Math.random()*3;
+  btnAdvance.addEventListener('click', () => {
+    currentQuoteIndex = (currentQuoteIndex + 1) % upQuotes.length;
+    updateQuote();
+    
+    // Rotar la brújula del botón al hacer click
+    gsap.to(".animate-compass", { rotation: "+=360", duration: 0.6, ease: "power1.out" });
+    
+    // Lanzar una explosión festiva de globos extras al avanzar de página
+    for(let i=0; i<8; i++) {
+      setTimeout(spawnBalloon, i * 80);
+    }
+  });
 
-star.style.width=size+"px";
-star.style.height=size+"px";
+  // Clímax interactivo: Click en la chapa de Grape Soda
+  document.getElementById('badge-trigger').addEventListener('click', () => {
+    // Animación de escalado en la chapa
+    gsap.to("#badge-trigger", { scale: 1.3, duration: 0.1, yoyo: true, repeat: 1 });
+    
+    // Lluvia masiva de globos
+    for(let i = 0; i < 25; i++) {
+      setTimeout(spawnBalloon, i * 40);
+    }
+  });
 
-star.style.left=Math.random()*100+"%";
-star.style.top=Math.random()*100+"%";
+  // 3. Generador de Globos Procedurales con GSAP
+  function spawnBalloon() {
+    const balloon = document.createElement('div');
+    balloon.className = 'balloon';
+    
+    const string = document.createElement('div');
+    string.className = 'balloon-string';
+    balloon.appendChild(string);
 
-star.style.animationDelay=Math.random()*5+"s";
+    // Variaciones aleatorias
+    const randomColor = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+    const startX = Math.random() * 100; // Posición horizontal inicial en vw
+    const scale = Math.random() * (1.2 - 0.6) + 0.6;
+    const duration = Math.random() * (10 - 6) + 6; // Velocidad de subida
 
-stars.appendChild(star);
-}
+    balloon.style.backgroundColor = randomColor;
+    balloon.style.left = `${startX}vw`;
+    balloon.style.transform = `scale(${scale})`;
+    
+    skyCanvas.appendChild(balloon);
 
-function createBalloon(){
+    // Animación de subida con un ligero vaivén horizontal (sinusoide)
+    gsap.to(balloon, {
+      bottom: '110vh',
+      x: `rgba(${Math.random() * 60 - 30})`, 
+      duration: duration,
+      ease: "power1.inOut",
+      onComplete: () => balloon.remove()
+    });
+  }
 
-const balloon=document.createElement("img");
+  // 4. Generador de la Casa de Carl volando de fondo
+  function spawnHouse() {
+    const house = document.createElement('div');
+    house.className = 'up-house';
+    // Usamos el icono de una casa de Font Awesome
+    house.innerHTML = '<i class="fa-solid fa-house-chimney"></i>';
+    
+    const startX = Math.random() * 70 + 10; // Evitar bordes extremos
+    house.style.left = `${startX}vw`;
+    
+    skyCanvas.appendChild(house);
 
-balloon.className="balloon";
+    // Animación más lenta y majestuosa para la casa
+    gsap.to(house, {
+      bottom: '120vh',
+      rotation: Math.random() * 20 - 10,
+      duration: 14,
+      ease: "none",
+      onComplete: () => house.remove()
+    });
+  }
 
-balloon.src="https://cdn-icons-png.flaticon.com/512/744/744465.png";
-
-balloon.style.left=Math.random()*100+"vw";
-
-balloon.style.width=(50+Math.random()*50)+"px";
-
-balloon.style.animationDuration=
-(15+Math.random()*10)+"s";
-
-document.body.appendChild(balloon);
-
-setTimeout(()=>{
-balloon.remove();
-},25000);
-
-}
-
-setInterval(createBalloon,1200);
-
-function showMessage(){
-
-alert(`
-Para la persona que convirtió
-mi mundo en una aventura.
-
-Gracias por existir ❤️
-`);
-
-}
-
-document.addEventListener("mousemove",(e)=>{
-
-if(Math.random()>.85){
-
-const heart=document.createElement("div");
-
-heart.className="heart";
-
-heart.innerHTML="❤️";
-
-heart.style.left=e.pageX+"px";
-heart.style.top=e.pageY+"px";
-
-document.body.appendChild(heart);
-
-setTimeout(()=>{
-heart.remove();
-},5000);
-
-}
-
-});
-
+  // 5. Nubes estéticas decorativas
+  function createClouds() {
+    const container = document.getElementById('clouds-container');
+    for (let i = 0; i < 5; i++) {
+      const cloud = document.createElement('div');
+      cloud.className = 'cloud';
+      cloud.style.width = `${Math.random() * 120 + 80}px`;
+      cloud.style.height = `${Math.random() * 40 + 30}px`;
+      cloud.style.top = `${Math.random() * 70}%`;
+      cloud.style.left = `${Math.random() * 90}%`;
+      container.appendChild(cloud);
+      
+      // Movimiento infinito y lento hacia los lados
+      gsap.to(cloud, {
+        x: '+=40', duration: Math.random() * 10 + 10, yoyo: true, repeat: -1, ease: "sine.inOut"
+      });
+    }
+  }
 </script>
-
 </body>
 </html>

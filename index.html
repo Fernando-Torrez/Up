@@ -130,17 +130,16 @@
   .cover-subtitle {
     color: #ffd27d; font-family: 'Cabin Sketch', cursive; font-size: 28px; margin: 10px 0 0 0; text-shadow: 1px 2px 0px #1d0f07;
   }
-  .soda-badge {
-    width: 120px; height: 120px; background: #e0e0e0; border-radius: 50%;
-    border: 5px dashed #7a7a7a; margin-bottom: 20px; display: flex;
-    justify-content: center; align-items: center; box-shadow: 0 12px 25px rgba(0,0,0,0.4);
-    position: relative; cursor: pointer;
-  }
-  .soda-badge::after {
-    content: "GRAPE\nSODA"; white-space: pre-line; text-align: center;
-    font-family: 'Cabin Sketch', cursive; font-size: 15px; font-weight: bold;
-    color: white; background: #5c2763; padding: 12px; border-radius: 50%;
-    border: 3px solid white; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  
+  /* --- NUEVO ESTILO DE LA CHAPA GRAPE SODA REAL --- */
+  .soda-badge-img {
+    width: 135px; height: 135px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    cursor: pointer;
+    /* Efecto de relieve y sombra realista sobre cuero */
+    filter: drop-shadow(0px 12px 18px rgba(0, 0, 0, 0.45)) contrast(1.05) brightness(1.02);
+    transition: transform 0.2s ease;
   }
 
   /* --- CONTADOR --- */
@@ -177,15 +176,17 @@
     
     <div id="adventure-book">
       
+      <!-- PAG 1: PORTADA CON LA NUEVA IMAGEN DE LA CHAPA -->
       <div class="page hard" style="background: var(--leather-base); justify-content: center;">
         <div class="cover-content">
-          <div class="soda-badge" id="special-badge-click"></div>
+          <img src="https://elpingo.com/wp-content/uploads/2023/03/grape-soda-up.png" alt="Grape Soda Pin" class="soda-badge-img" id="special-badge-click" />
           <h2 class="cover-title">Nuestro Libro de Aventuras</h2>
           <h3 class="cover-subtitle">Mel & Fer</h3>
           <p style="color: #dac7ad; font-size: 15px; margin-top: 25px;">Pasa las páginas usando los botones inferiores</p>
         </div>
       </div>
 
+      <!-- PAG 2: CONTADOR -->
       <div class="page">
         <h2 style="font-family:'Cabin Sketch', cursive; font-size: 30px; color: var(--leather-base); margin:0;">Bitácora de Vuelo</h2>
         <div class="adventure-clock-box">
@@ -193,10 +194,11 @@
           <span style="font-size: 15px; font-weight: bold; color: #555; margin-top: 5px;">Días de Aventuras</span>
         </div>
         <div class="story-card" style="text-align: center;">
-          «Todo comenzó un mágico 5 de junio de 2026. Ese día los mundos de Mel y Fer se juntaro por medio de Slack, desde entonces abrimos este cuaderno rústico y decidimos emprender juntos el viaje más maravilloso de nuestras vidas.»
+          «Todo comenzó un mágico 5 de junio de 2026. Ese día los mundos de Mel y Fer se juntaron por medio de Slack, desde entonces abrimos este cuaderno rústico y decidimos emprender juntos el viaje más maravilloso de nuestras vidas.»
         </div>
       </div>
 
+      <!-- PAG 3: NIÑOS MIRANDO EL HORIZONTE -->
       <div class="page" style="--r: -1.2deg;">
         <div class="photo-frame">
           <div class="tape"></div><div class="tape tr"></div>
@@ -207,6 +209,7 @@
         </div>
       </div>
 
+      <!-- PAG 4: JÚRALO CON EL CORAZÓN -->
       <div class="page" style="--r: 1.8deg;">
         <div class="photo-frame">
           <div class="tape"></div><div class="tape tr"></div>
@@ -217,6 +220,7 @@
         </div>
       </div>
 
+      <!-- PAG 5: CARL JURÁNDOLE A ELLIE -->
       <div class="page" style="--r: -1deg;">
         <div class="photo-frame">
           <div class="tape"></div><div class="tape tr"></div>
@@ -227,16 +231,18 @@
         </div>
       </div>
 
+      <!-- PAG 6: GRAPE SODA -->
       <div class="page" style="--r: 1.5deg;">
         <div class="photo-frame">
           <div class="tape"></div><div class="tape tr"></div>
           <img src="https://i.pinimg.com/736x/30/b0/eb/30b0ebb3a429d585b0881c5c701eae32.jpg" alt="Grape Soda Badge">
         </div>
         <div class="story-card">
-          «Me eligió formalmente como su capitán de tripulación oficial fijando esa valiosa chapa de Grape Soda en mi pecho. Desde ese precioso instante entré a su club privado de exploradores. Prometo ser el mejor guía y timonel para llevar este gran barco al puerto más feliz.»
+          «Me elegiste formalmente como su capitán de tripulación oficial fijando esa valiosa chapa de Grape Soda en mi pecho. Desde ese precioso instante entré a tu club privado de exploradores. Prometo ser el mejor guía y timonel para llevar este gran barco al puerto más feliz.»
         </div>
       </div>
 
+      <!-- PAG 7: CARL Y ELLIE VIEJITOS -->
       <div class="page" style="--r: -2deg;">
         <div class="photo-frame">
           <div class="tape"></div><div class="tape tr"></div>
@@ -247,6 +253,7 @@
         </div>
       </div>
 
+      <!-- PAG 8: CASA VOLANDO -->
       <div class="page" style="--r: 1deg;">
         <div class="photo-frame">
           <div class="tape"></div><div class="tape tr"></div>
@@ -257,6 +264,7 @@
         </div>
       </div>
 
+      <!-- PAG 9: NUESTRO DESTINO (ZÓCALO) -->
       <div class="page" style="--r: -0.8deg;">
         <div class="photo-frame">
           <div class="tape"></div><div class="tape tr"></div>
@@ -267,6 +275,7 @@
         </div>
       </div>
 
+      <!-- PAG 10: CONTRAPORTADA FINAL -->
       <div class="page hard" style="background: var(--leather-dark); justify-content: center;">
         <div class="cover-content">
           <i class="fa-solid fa-heart" style="font-size: 55px; color: #e74c3c; margin-bottom: 15px;"></i>

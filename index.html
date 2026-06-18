@@ -5,322 +5,343 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Our Adventure Book — Carl & Ellie</title>
 
+<!-- Fuentes Mágicas y Temáticas -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@700&family=Short+Stack&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
+<!-- Librerías Necesarias para el Efecto de Libro Real (Turn.js + jQuery + GSAP) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/blasten/turn.js@master/turn.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
 <style>
   :root {
-    --leather-dark: #3d2314;
-    --leather-light: #5c3a21;
-    --paper-clean: #fffbf2;
-    --paper-old: #f3ebd9;
-    --tape-color: rgba(244, 232, 203, 0.6);
+    --leather-dark: #3a2012;
+    --leather-base: #52331c;
+    --paper-old: #f4ebd0;
+    --paper-shadow: rgba(82, 51, 28, 0.15);
+    --tape-color: rgba(246, 235, 203, 0.55);
   }
 
   * { box-sizing: border-box; }
   body {
     margin: 0; height: 100vh; overflow: hidden;
-    font-family: 'Short Stack', cursive;
-    /* Fondo del cielo con nubes sutiles */
-    background: linear-gradient(180deg, #bbf2f6 0%, #86e3ce 100%);
+    font-family: 'Short Stack', cursive; color: #2e1f14;
+    background: linear-gradient(180deg, #bcf3f7 0%, #8ae5d1 100%);
     display: flex; flex-direction: column; justify-content: center; align-items: center;
-    perspective: 2000px;
   }
 
-  /* --- FONDO DE GLOBOS 3D MEJORADOS --- */
-  #sky-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-  
+  /* --- FONDO DE GLOBOS MEJORADOS --- */
+  #sky-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
   .balloon {
     position: absolute; bottom: -120px; width: 45px; height: 55px; 
     border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-    filter: drop-shadow(4px 8px 10px rgba(0,0,0,0.15));
+    filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.18));
   }
-  /* Efecto de luz/volumen en el globo */
   .balloon::before {
     content: ''; position: absolute; top: 8px; left: 10px; width: 10px; height: 15px;
-    background: rgba(255,255,255,0.4); border-radius: 50%; transform: rotate(-20deg);
+    background: rgba(255,255,255,0.45); border-radius: 50%; transform: rotate(-20deg);
   }
-  /* Nudo del globo */
   .balloon::after {
     content: ""; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
     border-left: 5px solid transparent; border-right: 5px solid transparent;
-    border-bottom: 7px solid currentColor; filter: brightness(0.8);
+    border-bottom: 7px solid currentColor; filter: brightness(0.75);
   }
   .balloon-string {
     position: absolute; bottom: -45px; left: 50%; width: 1px; height: 45px;
-    background: rgba(0, 0, 0, 0.15); transform-origin: top center;
+    background: rgba(0, 0, 0, 0.12); transform-origin: top center;
   }
 
-  /* --- ESTRUCTURA GIGANTE DEL LIBRO --- */
-  .book-viewport {
+  /* --- CONTENEDOR DEL LIBRO REAL --- */
+  .book-wrapper {
     position: relative; z-index: 5;
-    width: min(1100px, 95vw); height: min(680px, 82vh);
-    transform-style: preserve-3d;
-    transition: transform 0.6s ease;
+    width: 1100px; height: 680px;
+    max-width: 95vw; max-height: 80vh;
   }
 
-  /* El lomo/pasta exterior de cuero */
-  .book-cover {
-    position: absolute; inset: -12px -18px;
-    background: var(--leather-dark);
+  /* El lomo/pasta exterior de cuero realista */
+  .book-outer-cover {
+    position: absolute; inset: -14px -20px;
+    background: var(--leather-base);
     background-image: 
-      radial-gradient(circle at 50% 50%, transparent 50%, rgba(0,0,0,0.4) 100%),
-      repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 10px);
-    border-radius: 20px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.4), inset 0 0 20px rgba(0,0,0,0.6);
-    border: 5px solid #28160c;
+      radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.5) 100%),
+      url('https://www.transparenttextures.com/patterns/leather.png'); /* Textura cuero rugoso */
+    border-radius: 24px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.45), inset 0 0 30px rgba(0,0,0,0.7);
+    border: 6px solid #28160c;
+    pointer-events: none; z-index: 2;
   }
 
-  /* Bisagra central del libro */
-  .book-spine {
-    position: absolute; left: 50%; top: 0; bottom: 0; width: 40px; 
-    transform: translateX(-50%); background: #28160c; z-index: 10;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+  /* Motor Turn.js - Libro */
+  #adventure-book { width: 100%; height: 100%; z-index: 4; }
+
+  /* Estilos base de cada hoja */
+  .page {
+    background: var(--paper-old);
+    background-image: url('https://www.transparenttextures.com/patterns/lined-paper-2.png'); /* Textura de papel viejo */
+    box-shadow: inset 0 0 40px var(--paper-shadow);
+    padding: 40px; display: flex; flex-direction: column;
+    justify-content: space-between; align-items: center;
+    overflow-y: auto; /* Permite scroll sutil si agregas demasiado texto */
   }
 
-  /* Páginas Libro Abierto (Contenedor de hojas) */
-  .pages-container {
-    position: absolute; inset: 0; display: flex; transform-style: preserve-3d;
-  }
+  /* Páginas de la pasta dura (Primera y última interna) */
+  .page.hard { background: var(--leather-dark); color: #f7ebd9; }
 
-  /* Bloque de Hojas Izquierda y Derecha */
-  .book-half {
-    flex: 1; position: relative; background: var(--paper-old);
-    padding: 35px; display: flex; flex-direction: column;
-    justify-content: space-between; align-items: center; overflow: hidden;
-    box-shadow: inset 0 0 30px rgba(92,58,33,0.2);
+  /* --- DETALLES DE DISEÑO INTERNO (SCRAPBOOK) --- */
+  .photo-frame {
+    width: 85%; height: 55%; background: #ffffff; padding: 15px 15px 45px 15px;
+    box-shadow: 4px 8px 20px rgba(0,0,0,0.18); border: 1px solid #dfd6c0;
+    position: relative; transform: rotate(var(--r, 1deg)); flex-shrink: 0;
   }
-  .book-half.left {
-    border-radius: 8px 0 0 8px; border-right: 2px solid rgba(0,0,0,0.2);
-    background-image: linear-gradient(90deg, rgba(0,0,0,0.05) 0%, transparent 5%, transparent 95%, rgba(0,0,0,0.15) 100%);
-  }
-  .book-half.right {
-    border-radius: 0 8px 8px 0; border-left: 2px solid rgba(0,0,0,0.2);
-    background-image: linear-gradient(270deg, rgba(0,0,0,0.05) 0%, transparent 5%, transparent 95%, rgba(0,0,0,0.15) 100%);
-  }
-
-  /* Textura de hojas amontonadas en los bordes */
-  .book-half::after {
-    content: ''; position: absolute; bottom: -5px; height: 5px; background: #dcd1ba;
-    box-shadow: 0 1px 0 #bfae93, 0 2px 0 #ab9a7e, 0 3px 0 #96866b;
-  }
-  .left::after { left: 10px; right: 0; border-radius: 0 0 0 5px; }
-  .right::after { right: 10px; left: 0; border-radius: 0 0 5px 0; }
-
-  /* --- DETALLES DE RECORTE (SCRAPBOOK) --- */
-  .photo-holder {
-    width: 90%; height: 75%; background: #ffffff; padding: 15px 15px 45px 15px;
-    box-shadow: 3px 6px 15px rgba(0,0,0,0.15); border: 1px solid #e2dacf;
-    position: relative; transform: rotate(var(--r, 1deg));
-  }
-  .photo-holder img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
   
-  /* Cintas adhesivas en las esquinas */
-  .tape-deco {
-    position: absolute; width: 75px; height: 25px; background: var(--tape-color);
-    backdrop-filter: blur(1px); transform: rotate(-35deg); top: -8px; left: -15px;
-    box-shadow: 1px 2px 3px rgba(0,0,0,0.05);
+  .tape {
+    position: absolute; width: 80px; height: 26px; background: var(--tape-color);
+    backdrop-filter: blur(1px); transform: rotate(-30deg); top: -10px; left: -18px;
+    box-shadow: 1px 2px 3px rgba(0,0,0,0.04);
   }
-  .tape-deco.tr { left: auto; right: -15px; transform: rotate(35deg); }
+  .tape.tr { left: auto; right: -18px; transform: rotate(30deg); }
 
-  /* Cuaderno de notas o cartón de texto */
-  .text-card {
-    width: 90%; padding: 15px 20px; background: rgba(255,255,255,0.6);
-    border-radius: 6px; border-left: 4px solid var(--leather-light);
-    font-size: clamp(14px, 1.8vw, 20px); line-height: 1.5; text-align: left;
-    color: #312217; transform: rotate(var(--tr, -0.5deg));
+  /* Bloque de Textos e Historias Ambas Páginas */
+  .story-card {
+    width: 90%; padding: 18px 22px; background: rgba(255,255,255,0.45);
+    border-radius: 8px; border-left: 5px solid var(--leather-base);
+    font-size: clamp(14px, 1.6vw, 18px); line-height: 1.6; text-align: left;
+    color: #2b1a0e; margin-top: 15px;
   }
 
-  /* --- PORTADA DISEÑO FIEL --- */
-  .custom-cover-view {
-    position: absolute; inset: 0; background: var(--leather-light); z-index: 20;
+  /* Espacio libre reservado para que escribas más */
+  .extra-space {
+    width: 90%; margin-top: 10px; padding: 10px;
+    border: 1px dashed rgba(0, 0, 0, 0.15); border-radius: 4px;
+    font-size: 13px; color: #756353; font-style: italic; text-align: center;
+    background: rgba(255,255,255,0.2); min-height: 45px;
+  }
+
+  /* --- DISEÑO DE PORTADA DE CUERO --- */
+  .cover-content {
     display: flex; flex-direction: column; justify-content: center; align-items: center;
-    border-radius: 8px; border: 4px solid #422815;
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+    height: 100%; text-align: center; background: var(--leather-base);
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.6); width: 100%; border-radius: 4px;
   }
   .cover-title {
-    font-family: 'Cabin Sketch', cursive; font-size: clamp(40px, 6vw, 75px);
-    color: #f7ebd9; text-align: center; margin: 0;
-    text-shadow: 3px 4px 0px #21130a; letter-spacing: 2px;
+    font-family: 'Cabin Sketch', cursive; font-size: clamp(38px, 5vw, 68px);
+    color: #fcefd2; margin: 0; text-shadow: 3px 4px 0px #1d0f07; letter-spacing: 2px;
   }
-  .grape-soda-badge {
-    width: 110px; height: 110px; background: #dedede; border-radius: 50%;
-    border: 5px dashed #8a8a8a; margin-bottom: 30px; display: flex;
-    justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  .soda-badge {
+    width: 120px; height: 120px; background: #e0e0e0; border-radius: 50%;
+    border: 5px dashed #7a7a7a; margin-bottom: 30px; display: flex;
+    justify-content: center; align-items: center; box-shadow: 0 12px 25px rgba(0,0,0,0.4);
     position: relative; cursor: pointer;
   }
-  .grape-soda-badge::after {
+  .soda-badge::after {
     content: "GRAPE\nSODA"; white-space: pre-line; text-align: center;
-    font-family: 'Cabin Sketch', cursive; font-size: 14px; font-weight: bold;
-    color: white; background: #5a2c6d; padding: 12px; border-radius: 50%;
-    border: 3px solid white; box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
+    font-family: 'Cabin Sketch', cursive; font-size: 15px; font-weight: bold;
+    color: white; background: #5c2763; padding: 12px; border-radius: 50%;
+    border: 3px solid white; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
   }
 
-  /* --- CONTROLES --- */
-  .nav-bar { display: flex; gap: 30px; margin-top: 25px; z-index: 10; }
-  .btn-nav {
+  /* --- RELOJ DE AVENTURA CONTADOR --- */
+  .adventure-clock-box {
+    text-align: center; background: white; padding: 30px; border-radius: 50%;
+    width: 240px; height: 240px; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    border: 8px double var(--leather-base); margin: 20px 0;
+  }
+  .clock-days {
+    font-family: 'Cabin Sketch', cursive; font-size: 52px; color: #a63a50; margin: 0;
+  }
+
+  /* --- BOTONERA --- */
+  .navigation-bar { display: flex; gap: 40px; margin-top: 25px; z-index: 10; }
+  .nav-btn {
     appearance: none; border: 0; background: var(--leather-dark); color: #f7ebd9;
-    padding: 14px 32px; font-family: inherit; font-size: 18px; font-weight: bold;
+    padding: 14px 36px; font-family: inherit; font-size: 18px; font-weight: bold;
     border-radius: 30px; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    display: flex; align-items: center; gap: 10px; transition: all 0.2s;
+    display: flex; align-items: center; gap: 12px; transition: all 0.2s;
   }
-  .btn-nav:hover { background: #21130a; transform: translateY(-2px); }
-  .btn-nav:disabled { background: #705f55; opacity: 0.5; cursor: not-allowed; transform: none; }
+  .nav-btn:hover { background: #1d0f07; transform: translateY(-2px); }
 
-  /* Ocultar elementos lógicos */
-  .hidden { display: none !important; }
+  /* Ajustes específicos de Turn.js */
+  .even { background-image: linear-gradient(90deg, rgba(0,0,0,0.06) 0%, transparent 10%, transparent 100%) !important; }
+  .odd { background-image: linear-gradient(270deg, rgba(0,0,0,0.06) 0%, transparent 10%, transparent 100%) !important; }
 </style>
 </head>
 <body>
 
+  <!-- Nubes y Globos Dinámicos de Fondo -->
   <div id="sky-canvas"></div>
 
-  <main class="book-viewport" id="book-window">
-    <div class="book-cover"></div>
-    <div class="book-spine"></div>
-
-    <div class="custom-cover-view" id="front-cover">
-      <div class="grape-soda-badge" id="badge-click" title="¡Haz clic para una sorpresa!"></div>
-      <h2 class="cover-title">Our Adventure Book</h2>
-      <p style="color: #dac7ad; margin-top: 15px; font-size: 18px;">Click en Siguiente para abrir...</p>
-    </div>
-
-    <div class="pages-container hidden" id="pages-layout">
+  <!-- Estructura del Libro -->
+  <div class="book-wrapper">
+    <div class="book-outer-cover"></div>
+    
+    <div id="adventure-book">
       
-      <section class="book-half left">
-        <div class="photo-holder" id="left-photo-frame" style="--r: -1.2deg;">
-          <div class="tape-deco"></div>
-          <div class="tape-deco tr"></div>
-          <img src="" id="left-img" alt="Momento de aventura">
+      <!-- PAG 1: PORTADA EXTERNA -->
+      <div class="page hard">
+        <div class="cover-content">
+          <div class="soda-badge" id="special-badge-click" title="¡Haz clic para inflar globos!"></div>
+          <h2 class="cover-title">Our Adventure Book</h2>
+          <p style="color: #dac7ad; font-size: 17px; margin-top: 20px;">Arrastra la esquina o usa los botones</p>
         </div>
-      </section>
+      </div>
 
-      <section class="book-half right">
-        <div class="text-card" id="right-text-frame" style="--tr: 1deg;">
-          <p id="right-text">Cargando memorias...</p>
+      <!-- PAG 2: EL RELOJ DE AVENTURA (5 DE JUNIO DE 2026) -->
+      <div class="page">
+        <h2 style="font-family:'Cabin Sketch', cursive; font-size: 32px; color: var(--leather-base); margin:0;">El Contador de Bitácora</h2>
+        <div class="adventure-clock-box">
+          <span class="clock-days" id="counter-days">0</span>
+          <span style="font-size: 16px; font-weight: bold; color: #555;">Días de Aventuras</span>
         </div>
-        <span id="page-number" style="font-size: 14px; opacity: 0.6; font-weight: bold;">Placa 1</span>
-      </section>
+        <div class="story-card" style="text-align: center;">
+          «Todo comenzó un mágico 5 de junio de 2026. Ese día nuestros caminos se cruzaron, abrimos este cuaderno en blanco y decidimos comenzar el viaje más bonito de todos.»
+        </div>
+        <div class="extra-space"><!-- Puedes escribir más aquí dentro --></div>
+      </div>
+
+      <!-- PAG 3: NIÑOS MIRANDO EL HORIZONTE -->
+      <div class="page" style="--r: -1.5deg;">
+        <div class="photo-frame">
+          <div class="tape"></div><div class="tape tr"></div>
+          <img src="https://i.pinimg.com/736x/fe/cc/e1/fecce155c3031f268edc605eda2237d6.jpg" alt="Carl y Ellie de pequeños">
+        </div>
+        <div class="story-card">
+          «Mirar hacia el horizonte a tu lado me recuerda tanto a ellos. Tú tienes ese espíritu de Ellie: eres intrépida, llena de energía, iluminas cualquier lugar y haces que cada día parezca una expedición emocionante. Y yo... bueno, yo soy tu Carl; un poco más tímido, tierno y con esa inocencia que solo busca protegerte y seguir tus locuras a donde sea.»
+        </div>
+        <div class="extra-space"><!-- Puedes escribir más aquí dentro --></div>
+      </div>
+
+      <!-- PAG 4: JÚRALO CON EL CORAZÓN -->
+      <div class="page" style="--r: 2deg;">
+        <div class="photo-frame">
+          <div class="tape"></div><div class="tape tr"></div>
+          <img src="https://i.pinimg.com/736x/eb/7e/ec/eb7eecd78eb4e80e3bdfd659dd53f3e9.jpg" alt="Júralo con el corazón">
+        </div>
+        <div class="story-card">
+          «"¿Me lo prometes? Júralo con el corazón..." Esa frase se quedó grabada en mí. Construir un futuro contigo, diseñar nuestra casita peldaño a peldaño y proteger lo nuestro es la promesa más bonita que tengo. No es un juego de niños, es mi pacto contigo.»
+        </div>
+        <div class="extra-space"><!-- Puedes escribir más aquí dentro --></div>
+      </div>
+
+      <!-- PAG 5: CARL JURÁNDOLE A ELLIE -->
+      <div class="page" style="--r: -1deg;">
+        <div class="photo-frame">
+          <div class="tape"></div><div class="tape tr"></div>
+          <img src="https://i.pinimg.com/736x/3c/e9/8f/3ce98f30495c1574d16d6007d412b83c.jpg" alt="Juramento de Carl">
+        </div>
+        <div class="story-card">
+          «Y cruzando mi mano sobre el pecho, te lo prometo hoy y siempre. Estaré ahí para sostener los cables, para inflar los globos cuando sople el viento en contra y para asegurarme de que jamás te falte una sonrisa en el camino.»
+        </div>
+        <div class="extra-space"><!-- Puedes escribir más aquí dentro --></div>
+      </div>
+
+      <!-- PAG 6: GRAPE SODA (CAPITÁN DE TRIPULACIÓN) -->
+      <div class="page" style="--r: 1.8deg;">
+        <div class="photo-frame">
+          <div class="tape"></div><div class="tape tr"></div>
+          <img src="https://i.pinimg.com/736x/30/b0/eb/30b0ebb3a429d585b0881c5c701eae32.jpg" alt="Grape Soda Badge">
+        </div>
+        <div class="story-card">
+          «Me elegiste como tu capitán de tripulación, fijando esa pequeña chapa en mi pecho. Desde ese instante, pertenezco a tu club de exploradores oficial. No hay mayor honor en todo el planeta que ser el encargado de guiar el timón de nuestro viaje.»
+        </div>
+        <div class="extra-space"><!-- Puedes escribir más aquí dentro --></div>
+      </div>
+
+      <!-- PAG 7: CARL Y ELLIE ABRAZADOS CON UN GLOBITO -->
+      <div class="page" style="--r: -2deg;">
+        <div class="photo-frame">
+          <div class="tape"></div><div class="tape tr"></div>
+          <img src="https://i.pinimg.com/736x/16/5f/9d/165f9d080237e2bcf3de9c29043f671d.jpg" alt="Abrazados viejo">
+        </div>
+        <div class="story-card">
+          «Los años podrán pasar y el segundero seguirá girando, pero mi rincón favorito del universo entero siempre será justo aquí, acurrucado a tu lado mientras sostenemos juntos ese pequeño hilo de ilusión que nos mantiene flotando sobre la rutina.»
+        </div>
+        <div class="extra-space"><!-- Puedes escribir más aquí dentro --></div>
+      </div>
+
+      <!-- PAG 8: CASA CON GLOBOS -->
+      <div class="page" style="--r: 1.2deg;">
+        <div class="photo-frame">
+          <div class="tape"></div><div class="tape tr"></div>
+          <img src="https://i.pinimg.com/736x/65/24/79/652479f263ce1ef1ac265031631043c7.jpg" alt="Casa volando">
+        </div>
+        <div class="story-card">
+          «Si el mundo allá afuera se vuelve aburrido o gris, no te preocupes. Ataremos diez mil globos de colores brillantes a nuestro tejado, soplaremos fuerte y volaremos lejos del suelo... porque donde tú estés, ahí es mi hogar.»
+        </div>
+        <div class="extra-space"><!-- Puedes escribir más aquí dentro --></div>
+      </div>
+
+      <!-- PAG 9: LAS CATARATAS DEL PARAÍSO (CIUDAD DE MÉXICO ZÓCALO) -->
+      <div class="page" style="--r: -0.5deg;">
+        <div class="photo-frame">
+          <div class="tape"></div><div class="tape tr"></div>
+          <img src="https://blog.estrellaroja.com.mx/wp-content/uploads/2022/09/14.-Complementaria-al-Contenido-min-1-min-scaled.jpg" alt="Zócalo de México">
+        </div>
+        <div class="story-card">
+          «Nuestras Cataratas del Paraíso particulares nos esperan en las calles y la magia del Zócalo de la Ciudad de México. Ese es nuestro destino dorado. Dime, mi aventurera favorita... ¿Estás lista para seguir llenando este libro con miles de páginas impresas de puros recuerdos juntos?» 🗺️
+        </div>
+        <div class="extra-space"><!-- Puedes escribir más aquí dentro --></div>
+      </div>
+
+      <!-- PAG 10: CONTRAPORTADA FINAL -->
+      <div class="page hard">
+        <div class="cover-content">
+          <i class="fa-solid fa-heart" style="font-size: 65px; color: #e74c3c; margin-bottom: 20px;"></i>
+          <h3 style="font-family:'Cabin Sketch', cursive; font-size: 35px; color: #fcefd2;">Fin del Capítulo 1</h3>
+          <p style="color: #dac7ad; font-size: 16px;">La aventura está ahí afuera...</p>
+        </div>
+      </div>
 
     </div>
-  </main>
+  </div>
 
-  <nav class="nav-bar">
-    <button class="btn-nav" id="prev-page" disabled><i class="fa-solid fa-chevron-left"></i> Anterior</button>
-    <button class="btn-nav" id="next-page">Siguiente <i class="fa-solid fa-chevron-right"></i></button>
+  <!-- Controles Inferiores -->
+  <nav class="navigation-bar">
+    <button class="nav-btn" onclick="$('#adventure-book').turn('previous')"><i class="fa-solid fa-arrow-left"></i> Anterior</button>
+    <button class="nav-btn" onclick="$('#adventure-book').turn('next')">Siguiente <i class="fa-solid fa-arrow-right"></i></button>
   </nav>
 
 <script>
-  // Estructura cronológica de la historia
-  const adventureSteps = [
-    {
-      img: "https://i.pinimg.com/736x/fe/cc/e1/fecce155c3031f268edc605eda2237d6.jpg",
-      text: "«Desde pequeños supimos mirar hacia el mismo horizonte. Cada juego, cada mirada silenciosa, marcaba el inicio del mapa de nuestras vidas.» ✨"
-    },
-    {
-      img: "https://i.pinimg.com/736x/eb/7e/ec/eb7eecd78eb4e80e3bdfd659dd53f3e9.jpg",
-      text: "«¿Me lo prometes? Júralo con el corazón... Porque construir un sueño a tu lado es el único plan que quiero cumplir.» ❤️"
-    },
-    {
-      img: "https://i.pinimg.com/736x/3c/e9/8f/3ce98f30495c1574d16d6007d412b83c.jpg",
-      text: "«Hice un juramento sagrado aquella tarde, y hoy te lo repito: te seguiré a donde el viento nos lleve, cuidando siempre de ti.» 🤝"
-    },
-    {
-      img: "https://i.pinimg.com/736x/30/b0/eb/30b0ebb3a429d585b0881c5c701eae32.jpg",
-      text: "«Eres oficialmente el capitán de mi tripulación, mi compañero de aventuras y poseedor de mi chapa favorita del mundo.» 🍇"
-    },
-    {
-      img: "https://i.pinimg.com/736x/16/5f/9d/165f9d080237e2bcf3de9c29043f671d.jpg",
-      text: "«Los años pasaron volando, pero entre tus brazos descubrí que no hacen falta grandes mapas para estar en el rincón más hermoso del universo.»"
-    },
-    {
-      img: "https://i.pinimg.com/736x/65/24/79/652479f263ce1ef1ac265031631043c7.jpg",
-      text: "«Y si la rutina intenta ganarnos, ataremos mil globos de colores a nuestro tejado y dejaremos el suelo atrás... juntos.» 🎈"
-    },
-    {
-      img: "https://i.pinimg.com/736x/e3/c0/7b/e3c07b40aa5b3eea6dfd4fb491f97126.jpg",
-      text: "«Gracias por esta hermosa aventura... ¡Ahora te toca a ti vivir una nueva! Te amo por siempre y para siempre.» — Ellie 🕊️"
-    }
-  ];
+  // 1. Inicialización de Turn.js para el paso de hojas interactivo real
+  $(document).ready(function() {
+    $("#adventure-book").turn({
+      width: 1100,
+      height: 680,
+      autoCenter: true,
+      duration: 1000, // Duración física de la hoja doblándose
+      acceleration: true,
+      elevation: 50,
+      gradients: true,
+      when: {
+        turning: function(event, page, pageObj) {
+          // Lanzar ráfaga de globos al pasar páginas
+          for(let i=0; i<6; i++) setTimeout(spawnBalloon, i * 100);
+        }
+      }
+    });
+    
+    calculateAdventureDays();
+  });
 
-  let stepIndex = -1; // -1 significa que estamos viendo la Portada exterior
-
-  const frontCover = document.getElementById('front-cover');
-  const pagesLayout = document.getElementById('pages-layout');
-  const leftImg = document.getElementById('left-img');
-  const rightText = document.getElementById('right-text');
-  const pageNumber = document.getElementById('page-number');
-  
-  const btnPrev = document.getElementById('prev-page');
-  const btnNext = document.getElementById('next-page');
-  const sky = document.getElementById('sky-canvas');
-
-  const palette = ['#ff7675', '#74b9ff', '#ffeaa7', '#a29bfe', '#ff9ff3', '#55efc4', '#ffbe76'];
-
-  // Renderizar la página actual con animaciones fluidas de paso de hoja
-  function renderStep(direction) {
-    if (stepIndex === -1) {
-      // Mostrar la portada de cuero de Ellie
-      frontCover.classList.remove('hidden');
-      pagesLayout.classList.add('hidden');
-      btnPrev.disabled = true;
-      return;
-    }
-
-    // Asegurar que el contenedor de hojas esté activo
-    frontCover.classList.add('hidden');
-    pagesLayout.classList.remove('hidden');
-    btnPrev.disabled = false;
-    btnNext.disabled = stepIndex === adventureSteps.length - 1;
-
-    const data = adventureSteps[stepIndex];
-
-    // Animación de cambio de contenido simula paso de página física
-    gsap.fromTo("#book-window", 
-      { rotationY: direction === 'next' ? 2 : -2 },
-      { rotationY: 0, duration: 0.6, ease: "power2.out" }
-    );
-
-    gsap.fromTo([".photo-holder", ".text-card"],
-      { opacity: 0, y: direction === 'next' ? 15 : -15 },
-      { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "back.out(1)" }
-    );
-
-    // Setear datos
-    leftImg.src = data.img;
-    rightText.innerHTML = data.text;
-    pageNumber.innerText = `Aventura cap. ${stepIndex + 1}`;
-
-    // Disparar globos festivos en cada transición
-    for(let i=0; i<5; i++) setTimeout(spawnBalloon, i*80);
+  // 2. Contador Dinámico exacto desde el 5 de Junio de 2026
+  function calculateAdventureDays() {
+    const startDate = new Date("2026-06-05T00:00:00");
+    const today = new Date();
+    const timeDiff = today - startDate;
+    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    
+    // Si la fecha actual está antes del 5 de junio, mostrar 0 o los días correspondientes
+    document.getElementById("counter-days").innerText = daysDiff > 0 ? daysDiff : 0;
   }
 
-  // Eventos de botones
-  btnNext.addEventListener('click', () => {
-    if (stepIndex < adventureSteps.length - 1) {
-      stepIndex++;
-      renderStep('next');
-    }
-  });
+  // 3. Sistema Procedural de Globos 3D por Helio (GSAP)
+  const colors = ['#ff7675', '#74b9ff', '#ffeaa7', '#a29bfe', '#ff9ff3', '#55efc4', '#ffbe76'];
+  const sky = document.getElementById('sky-canvas');
 
-  btnPrev.addEventListener('click', () => {
-    if (stepIndex >= 0) {
-      stepIndex--;
-      renderStep('prev');
-    }
-  });
-
-  // Sorpresa interactiva en la chapa Grape Soda de la portada
-  document.getElementById('badge-click').addEventListener('click', () => {
-    gsap.to("#badge-click", { scale: 1.2, rotation: "+=15", yoyo: true, repeat: 1, duration: 0.15 });
-    for(let i=0; i<30; i++) setTimeout(spawnBalloon, i * 35);
-  });
-
-  // Mecánica Avanzada de Globos Inflados en 3D
   function spawnBalloon() {
     const balloon = document.createElement('div');
     balloon.className = 'balloon';
@@ -329,39 +350,46 @@
     string.className = 'balloon-string';
     balloon.appendChild(string);
 
-    const chosenColor = palette[Math.floor(Math.random() * palette.length)];
+    const chosenColor = colors[Math.floor(Math.random() * colors.length)];
     const startX = Math.random() * 100;
     const scale = Math.random() * (1.3 - 0.6) + 0.6;
-    const speed = Math.random() * (9 - 5) + 5;
+    const speed = Math.random() * (8 - 5) + 5;
 
     balloon.style.backgroundColor = chosenColor;
-    balloon.style.color = chosenColor; // Para que el nudo combine perfectamente
+    balloon.style.color = chosenColor; // Sincroniza el nudo
     balloon.style.left = `${startX}vw`;
     balloon.style.transform = `scale(${scale})`;
 
     sky.appendChild(balloon);
 
-    // Animación de flotado hacia arriba con simulación de viento cruzado
+    // Animación física de ascenso vertical con vaivén
     gsap.to(balloon, {
       bottom: '115vh',
-      x: `+=${Math.random() * 80 - 40}`,
+      x: `+=${Math.random() * 100 - 50}`,
       duration: speed,
       ease: "power1.inOut",
       onComplete: () => balloon.remove()
     });
 
-    // Péndulo físico del hilo del globo independiente
+    // Péndulo del hilo del globo
     gsap.to(string, {
-      rotation: Math.random() * 20 - 10,
-      duration: 1.5,
+      rotation: Math.random() * 24 - 12,
+      duration: 1.4,
       yoyo: true,
       repeat: -1,
       ease: "sine.inOut"
     });
   }
 
-  // Flujo constante de globos en el cielo
-  setInterval(spawnBalloon, 700);
+  // Generación pasiva en el fondo de la pantalla
+  setInterval(spawnBalloon, 800);
+
+  // Clic en la chapa (Grape Soda) de la portada genera fiesta de globos
+  document.getElementById('special-badge-click').addEventListener('click', function(e) {
+    e.stopPropagation(); // Evita que se pase la hoja al tocar la chapa
+    gsap.to("#special-badge-click", { scale: 1.2, rotation: "+=15", yoyo: true, repeat: 1, duration: 0.15 });
+    for(let i=0; i<25; i++) setTimeout(spawnBalloon, i * 40);
+  });
 </script>
 </body>
 </html>

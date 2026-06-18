@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Our Adventure Book — Mel & Fer</title>
+<title>Our Adventure Book — Carl & Ellie</title>
 
 <!-- Fuentes Mágicas y Temáticas -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@700&family=Short+Stack&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-<!-- Librerías para el Efecto Libro 3D y Super Carga de Globos (Turn.js + jQuery + GSAP) -->
+<!-- Librerías para el Efecto Libro 3D y Super Carga de Globos -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/blasten/turn.js@master/turn.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -21,7 +21,7 @@
     --leather-dark: #3a2012;
     --leather-base: #52331c;
     --paper-old: #f4ebd0;
-    --paper-shadow: rgba(82, 51, 28, 0.15);
+    --paper-shadow: rgba(82, 51, 28, 0.18);
     --tape-color: rgba(246, 235, 203, 0.6);
   }
 
@@ -42,12 +42,10 @@
     filter: drop-shadow(6px 12px 14px rgba(0,0,0,0.15));
     will-change: transform, bottom, left;
   }
-  /* Brillo realista de volumen */
   .balloon::before {
     content: ''; position: absolute; top: 7px; left: 11px; width: 11px; height: 16px;
     background: rgba(255,255,255,0.5); border-radius: 50%; transform: rotate(-22deg);
   }
-  /* Nudo de amarre inferior */
   .balloon::after {
     content: ""; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
     border-left: 5px solid transparent; border-right: 5px solid transparent;
@@ -59,45 +57,52 @@
     will-change: transform;
   }
 
-  /* --- CONTENEDOR DEL LIBRO REAL --- */
+  /* --- CONTENEDOR DEL LIBRO REAL (BORDES PULIDOS) --- */
   .book-wrapper {
     position: relative; z-index: 5;
     width: 1100px; height: 680px;
     max-width: 95vw; max-height: 80vh;
   }
 
-  /* Pasta exterior con textura de cuero real */
+  /* Pasta exterior alineada perfectamente con el tamaño de las hojas internas */
   .book-outer-cover {
-    position: absolute; inset: -14px -20px;
+    position: absolute; 
+    top: -6px; left: -6px; right: -6px; bottom: -6px;
     background: var(--leather-base);
     background-image: 
       radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.5) 100%),
       url('https://www.transparenttextures.com/patterns/leather.png');
-    border-radius: 24px;
+    border-radius: 16px;
     box-shadow: 0 35px 80px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.7);
     border: 6px solid #28160c;
     pointer-events: none; z-index: 2;
   }
 
-  #adventure-book { width: 100%; height: 100%; z-index: 4; }
+  #adventure-book { 
+    width: 100%; height: 100%; 
+    z-index: 4; 
+    border-radius: 12px;
+    overflow: hidden; /* Forzar a que los bordes extraños de turn.js no sobresalgan */
+  }
 
   /* Estilo interno de las hojas con textura pergamino */
   .page {
     background: var(--paper-old);
     background-image: url('https://www.transparenttextures.com/patterns/lined-paper-2.png');
     box-shadow: inset 0 0 45px var(--paper-shadow);
-    padding: 35px 40px; display: flex; flex-direction: column;
-    justify-content: space-between; align-items: center;
+    padding: 40px; display: flex; flex-direction: column;
+    justify-content: flex-start; align-items: center;
     overflow-y: auto;
   }
 
-  .page.hard { background: var(--leather-dark); color: #f7ebd9; }
+  .page.hard { background: var(--leather-dark); color: #f7ebd9; justify-content: center; }
 
   /* --- ÁLBUM DE RECORTES (SCRAPBOOK) --- */
   .photo-frame {
-    width: 85%; height: 54%; background: #ffffff; padding: 15px 15px 45px 15px;
-    box-shadow: 4px 10px 22px rgba(0,0,0,0.18); border: 1px solid #dfd6c0;
+    width: 85%; height: 55%; background: #ffffff; padding: 15px 15px 45px 15px;
+    box-shadow: 4px 10px 22px rgba(0,0,0,0.14); border: 1px solid #dfd6c0;
     position: relative; transform: rotate(var(--r, 1deg)); flex-shrink: 0;
+    margin-bottom: 20px;
   }
   .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
   
@@ -107,21 +112,19 @@
   }
   .tape.tr { left: auto; right: -18px; transform: rotate(30deg); }
 
-  /* Bloques Flexibles para textos largos */
+  /* Bloques para textos románticos */
   .story-card {
-    width: 92%; padding: 16px 20px; background: rgba(255,255,255,0.5);
+    width: 92%; padding: 20px; background: rgba(255,255,255,0.45);
     border-radius: 8px; border-left: 5px solid var(--leather-base);
-    font-size: clamp(14px, 1.55vw, 17.5px); line-height: 1.55; text-align: left;
-    color: #2b1a0e; margin-top: 10px; flex-grow: 0;
+    font-size: clamp(14px, 1.55vw, 17.5px); line-height: 1.6; text-align: left;
+    color: #2b1a0e; margin-bottom: 20px;
   }
 
-  /* Espacio en blanco dinámico a prueba de desfiguración */
-  .extra-space {
-    width: 92%; margin-top: 8px; padding: 8px;
-    border: 1px dashed rgba(0, 0, 0, 0.12); border-radius: 4px;
-    font-size: 13px; color: #756353; font-style: italic; text-align: center;
-    background: rgba(255,255,255,0.25); min-height: 45px; flex-grow: 1;
-    display: flex; align-items: center; justify-content: center;
+  /* Espacio en blanco completamente invisible y elástico */
+  .hidden-flexible-space {
+    width: 100%;
+    flex-grow: 1;
+    min-height: 20px;
   }
 
   /* --- PORTADA PRINCIPAL --- */
@@ -147,12 +150,12 @@
     border: 3px solid white; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
   }
 
-  /* --- MEDIDOR DE TIEMPO ESTILO RECORTE --- */
+  /* --- MEDIDOR DE TIEMPO --- */
   .adventure-clock-box {
     text-align: center; background: white; padding: 25px; border-radius: 50%;
     width: 230px; height: 230px; display: flex; flex-direction: column;
     justify-content: center; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    border: 8px double var(--leather-base); margin: 15px 0; flex-shrink: 0;
+    border: 8px double var(--leather-base); margin: 30px 0 20px 0; flex-shrink: 0;
   }
   .clock-days {
     font-family: 'Cabin Sketch', cursive; font-size: 56px; color: #a63a50; margin: 0; line-height: 1;
@@ -168,32 +171,32 @@
   }
   .nav-btn:hover { background: #1d0f07; transform: translateY(-2px); }
 
-  /* Turn.js sombra central de lomo */
+  /* Sombra del lomo central interna corregida */
   .even { background-image: linear-gradient(90deg, rgba(0,0,0,0.06) 0%, transparent 10%, transparent 100%) !important; }
   .odd { background-image: linear-gradient(270deg, rgba(0,0,0,0.06) 0%, transparent 10%, transparent 100%) !important; }
 </style>
 </head>
 <body>
 
-  <!-- Contenedor del cielo para la super tormenta de globos -->
+  <!-- Contenedor del cielo activo de globos -->
   <div id="sky-canvas"></div>
 
-  <!-- El Libro Interactivo -->
+  <!-- El Libro -->
   <div class="book-wrapper">
     <div class="book-outer-cover"></div>
     
     <div id="adventure-book">
       
-      <!-- CAPA 1: PORTADA -->
+      <!-- PAG 1: PORTADA -->
       <div class="page hard">
         <div class="cover-content">
-          <div class="soda-badge" id="special-badge-click" title="¡Haz clic para una explosión masiva de globos!"></div>
-          <h2 class="cover-title">Nuestro Libro de Aventuras</h2>
+          <div class="soda-badge" id="special-badge-click" title="¡Haz clic para una ráfaga masiva de globos!"></div>
+          <h2 class="cover-title">Our Adventure Book</h2>
           <p style="color: #dac7ad; font-size: 17px; margin-top: 20px;">Pasa las páginas usando los botones inferiores</p>
         </div>
       </div>
 
-      <!-- PAG 2: CONTADOR CRONOLÓGICO -->
+      <!-- PAG 2: EL RELOJ DE AVENTURA -->
       <div class="page">
         <h2 style="font-family:'Cabin Sketch', cursive; font-size: 32px; color: var(--leather-base); margin:0;">Bitácora de Vuelo</h2>
         <div class="adventure-clock-box">
@@ -203,7 +206,7 @@
         <div class="story-card" style="text-align: center;">
           «Todo comenzó un mágico 5 de junio de 2026. Ese día nuestros mundos colisionaron, abrimos este cuaderno rústico y decidimos emprender juntos el viaje más maravilloso e importante de nuestras vidas.»
         </div>
-        <div class="extra-space">Espacio disponible para añadir fechas o textos especiales...</div>
+        <div class="hidden-flexible-space"></div>
       </div>
 
       <!-- PAG 3: NIÑOS MIRANDO EL HORIZONTE -->
@@ -213,9 +216,9 @@
           <img src="https://i.pinimg.com/736x/fe/cc/e1/fecce155c3031f268edc605eda2237d6.jpg" alt="Carl y Ellie de pequeños">
         </div>
         <div class="story-card">
-          «Mirar hacia el horizonte a tu lado me recuerda tanto a esta escena. Tú tienes el alma pura de Ellie: eres intrépida, decidida, llenas todo de luz y conviertes cualquier día común en una expedición emocionante. Y yo... bueno, yo soy tu Carl; tierno, inocente y un poco tímido, pero con el corazón lleno de ganas de cuidarte y seguir tus pasos hacia donde quieras explorar.»
+          «Mirar hacia el horizonte a tu lado me recuerda tanto a esta scene. Tú tienes el alma pura de Ellie: eres intrépida, decidida, llenas todo de luz y conviertes cualquier día común en una expedición emocionante. Y yo... bueno, yo soy tu Carl; tierno, inocente y un poco tímido, pero con el corazón lleno de ganas de cuidarte y seguir tus pasos hacia donde quieras explorar.»
         </div>
-        <div class="extra-space">Puedes escribir más aquí si lo deseas...</div>
+        <div class="hidden-flexible-space"></div>
       </div>
 
       <!-- PAG 4: JÚRALO CON EL CORAZÓN -->
@@ -227,10 +230,10 @@
         <div class="story-card">
           «"¿Me lo prometes? Júralo con el corazón...". Esa frase se quedó tallada en mi pecho desde el inicio. Construir nuestro pequeño cuartel general, edificar cada rincón de nuestra felicidad peldaño por peldaño y defender lo nuestro contra viento y marea es el único juramento inquebrantable que tengo.»
         </div>
-        <div class="extra-space">Haz clic y escribe una anotación aquí...</div>
+        <div class="hidden-flexible-space"></div>
       </div>
 
-      <!-- PAG 5: CARL JURÁNDOLE A ELLIE (CON INTEGRACIÓN) -->
+      <!-- PAG 5: CARL JURÁNDOLE A ELLIE -->
       <div class="page" style="--r: -1deg;">
         <div class="photo-frame">
           <div class="tape"></div><div class="tape tr"></div>
@@ -239,7 +242,7 @@
         <div class="story-card">
           «Y cruzando firmemente mi mano sobre el pecho, te respondo con el alma: ¡Sí, lo juro, lo juro con el corazón! Te prometo estar firme en cada página de esta bitácora, sostener las cuerdas de nuestra nave cuando haya tormentas y asegurarme de que jamás viajes sola.»
         </div>
-        <div class="extra-space">Añade aquí tus promesas personalizadas...</div>
+        <div class="hidden-flexible-space"></div>
       </div>
 
       <!-- PAG 6: GRAPE SODA -->
@@ -251,7 +254,7 @@
         <div class="story-card">
           «Me elegiste formalmente como tu capitán de tripulación oficial fijando esa valiosa chapa de Grape Soda en mi pecho. Desde ese precioso instante entré a tu club privado de exploradores. Prometo ser el mejor guía y timonel para llevar este gran barco al puerto más feliz.»
         </div>
-        <div class="extra-space">Escribe un recuerdo especial sobre este capítulo...</div>
+        <div class="hidden-flexible-space"></div>
       </div>
 
       <!-- PAG 7: CARL Y ELLIE VIEJITOS -->
@@ -263,7 +266,7 @@
         <div class="story-card">
           «El reloj seguirá avanzando y las manecillas cambiarán nuestro aspecto, pero mi lugar predilecto en toda la Tierra siempre será aquí: acurrucado junto a ti, deteniendo el tiempo mientras sostenemos fuertemente ese pequeño hilo de ilusión que nos mantiene flotando.»
         </div>
-        <div class="extra-space">Espacio de notas libre...</div>
+        <div class="hidden-flexible-space"></div>
       </div>
 
       <!-- PAG 8: CASA VOLANDO -->
@@ -275,10 +278,10 @@
         <div class="story-card">
           «Cuando el mundo exterior se ponga gris o pesado, no te preocupes ni un segundo. Ataremos diez mil globos de helio de los colores más vivos a nuestro tejado, soplaremos con fuerza hacia arriba y dejaremos el suelo atrás... porque mi único hogar real eres tú.»
         </div>
-        <div class="extra-space">Puedes expandir tu texto sin romper la hoja...</div>
+        <div class="hidden-flexible-space"></div>
       </div>
 
-      <!-- PAG 9: NUESTRO DESTINO (ZÓCALO DE MÉXICO CORREGIDO) -->
+      <!-- PAG 9: NUESTRO DESTINO (ZÓCALO) -->
       <div class="page" style="--r: -0.8deg;">
         <div class="photo-frame">
           <div class="tape"></div><div class="tape tr"></div>
@@ -287,7 +290,7 @@
         <div class="story-card">
           «Nuestras Cataratas del Paraíso particulares nos esperan en la magia del Zócalo de la Ciudad de México para recorrerlo juntos de la mano. Dime, mi aventurera favorita... ¿Estás lista para seguir llenando este hermoso libro con miles de páginas repletas de recuerdos inolvidables?» 🗺️
         </div>
-        <div class="extra-space">Escribe aquí los planes de tu viaje de ensueño...</div>
+        <div class="hidden-flexible-space"></div>
       </div>
 
       <!-- PAG 10: CONTRAPORTADA FINAL -->
@@ -315,13 +318,13 @@
       width: 1100,
       height: 680,
       autoCenter: true,
-      duration: 1100, // Transición pesada realista
+      duration: 1100, 
       acceleration: true,
       elevation: 60,
       gradients: true,
       when: {
         turning: function(event, page, pageObj) {
-          // Ráfaga masiva complementaria al girar hojas
+          // Ráfaga al pasar hojas
           for(let i=0; i<12; i++) setTimeout(spawnBalloon, i * 60);
         }
       }
@@ -329,7 +332,7 @@
     
     calculateAdventureDays();
     
-    // Iniciar con un cielo activo y poblado de globos desde el segundo uno
+    // Población inicial de globos
     for(let i=0; i<20; i++) {
       setTimeout(spawnBalloon, i * 150);
     }
@@ -358,8 +361,8 @@
 
     const chosenColor = colors[Math.floor(Math.random() * colors.length)];
     const startX = Math.random() * 100;
-    const scale = Math.random() * (1.35 - 0.5) + 0.5; // Alta variedad de tamaños para profundidad
-    const speed = Math.random() * (7 - 4) + 4; // Subidas rápidas y variadas
+    const scale = Math.random() * (1.35 - 0.5) + 0.5; 
+    const speed = Math.random() * (7 - 4) + 4; 
 
     balloon.style.backgroundColor = chosenColor;
     balloon.style.color = chosenColor; 
@@ -368,7 +371,6 @@
 
     sky.appendChild(balloon);
 
-    // Animación de ascenso con rumbos y oscilaciones cruzadas tridimensionales
     gsap.to(balloon, {
       bottom: '115vh',
       x: `+=${Math.random() * 140 - 70}`,
@@ -377,7 +379,6 @@
       onComplete: () => balloon.remove()
     });
 
-    // Movimiento de péndulo físico en los hilos sueltos
     gsap.to(string, {
       rotation: Math.random() * 30 - 15,
       duration: 1.2,
@@ -387,14 +388,13 @@
     });
   }
 
-  // Generación en ráfaga constante por intervalos fijos (Mucho más poblado)
-  setInterval(spawnBalloon, 250);
+  // Multiplicador constante de globos en el fondo
+  setInterval(spawnBalloon, 220);
 
   // Gatillo explosivo masivo al hacer clic en la medalla Grape Soda
   document.getElementById('special-badge-click').addEventListener('click', function(e) {
-    e.stopPropagation(); // Previene el cambio de hoja accidental al interactuar
+    e.stopPropagation(); 
     gsap.to("#special-badge-click", { scale: 1.25, rotation: "+=20", yoyo: true, repeat: 1, duration: 0.15 });
-    // Lluvia masiva de 40 globos en cadena
     for(let i=0; i<40; i++) setTimeout(spawnBalloon, i * 25);
   });
 </script>

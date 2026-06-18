@@ -1,1 +1,391 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Nuestra Aventura ✨</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Poppins',sans-serif;
+overflow-x:hidden;
+background:linear-gradient(
+180deg,
+#0b1020,
+#1a2340,
+#253c7b
+);
+color:white;
+}
+
+.hero{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+position:relative;
+overflow:hidden;
+}
+
+h1{
+font-size:5rem;
+font-family:'Dancing Script',cursive;
+animation:fadeUp 2s ease;
+}
+
+.subtitle{
+margin-top:20px;
+font-size:1.3rem;
+max-width:700px;
+opacity:.9;
+animation:fadeUp 3s ease;
+}
+
+.btn{
+margin-top:40px;
+padding:15px 35px;
+border:none;
+border-radius:50px;
+font-size:1.1rem;
+cursor:pointer;
+background:white;
+color:#253c7b;
+font-weight:bold;
+transition:.4s;
+}
+
+.btn:hover{
+transform:scale(1.08);
+}
+
+.stars{
+position:fixed;
+width:100%;
+height:100%;
+z-index:-3;
+}
+
+.star{
+position:absolute;
+background:white;
+border-radius:50%;
+animation:twinkle 4s infinite;
+}
+
+.balloon{
+position:absolute;
+bottom:-200px;
+width:80px;
+animation:floatUp linear infinite;
+}
+
+.house{
+width:250px;
+margin-top:50px;
+animation:houseFloat 5s ease-in-out infinite;
+filter:drop-shadow(0 0 25px rgba(255,255,255,.3));
+}
+
+.section{
+padding:120px 10%;
+text-align:center;
+}
+
+.card{
+max-width:900px;
+margin:auto;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(10px);
+padding:50px;
+border-radius:25px;
+}
+
+.quote{
+font-size:2rem;
+font-family:'Dancing Script';
+margin-bottom:25px;
+}
+
+.timeline{
+display:grid;
+gap:25px;
+margin-top:50px;
+}
+
+.event{
+background:rgba(255,255,255,.08);
+padding:25px;
+border-radius:20px;
+transition:.4s;
+}
+
+.event:hover{
+transform:translateY(-8px);
+}
+
+footer{
+padding:80px;
+text-align:center;
+}
+
+.heart{
+position:fixed;
+pointer-events:none;
+animation:heartFloat 5s linear forwards;
+}
+
+@keyframes fadeUp{
+from{
+opacity:0;
+transform:translateY(50px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+@keyframes twinkle{
+50%{
+opacity:.2;
+}
+}
+
+@keyframes floatUp{
+from{
+transform:translateY(0);
+}
+to{
+transform:translateY(-130vh);
+}
+}
+
+@keyframes houseFloat{
+50%{
+transform:translateY(-20px);
+}
+}
+
+@keyframes heartFloat{
+to{
+transform:translateY(-300px);
+opacity:0;
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="stars" id="stars"></div>
+
+<section class="hero">
+
+<h1>Para Mi Chica Espacial ✨</h1>
+
+<p class="subtitle">
+Hay personas que aparecen en tu vida...
+y hay personas que se convierten en tu aventura favorita.
+Tú eres ambas.
+</p>
+
+<img
+class="house"
+src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800"
+>
+
+<button class="btn" onclick="showMessage()">
+Abrir Mi Carta ❤️
+</button>
+
+</section>
+
+<section class="section">
+
+<div class="card">
+
+<div class="quote">
+"Si pudiera elegir cualquier destino del universo,
+seguiría eligiendo caminar a tu lado."
+</div>
+
+<p>
+No eres mi casualidad favorita.
+Eres la persona que convirtió días normales
+en recuerdos extraordinarios.
+</p>
+
+</div>
+
+</section>
+
+<section class="section">
+
+<h2>Nuestra Línea Del Tiempo 🚀</h2>
+
+<div class="timeline">
+
+<div class="event">
+🌟 El día que nos conocimos
+</div>
+
+<div class="event">
+☁️ La primera conversación que no quería terminar
+</div>
+
+<div class="event">
+🎈 El momento en que supe que eras especial
+</div>
+
+<div class="event">
+🚀 Nuestra próxima aventura
+</div>
+
+</div>
+
+</section>
+
+<section class="section">
+
+<div class="card">
+
+<h2>Razones Por Las Que Me Gustas</h2>
+
+<br>
+
+<p>
+❤️ Tu forma de sonreír
+</p>
+
+<br>
+
+<p>
+❤️ Tu manera de hacer que todo sea más bonito
+</p>
+
+<br>
+
+<p>
+❤️ Porque contigo hasta los silencios tienen sentido
+</p>
+
+<br>
+
+<p>
+❤️ Porque cada día encuentro una nueva razón
+</p>
+
+</div>
+
+</section>
+
+<footer>
+
+<h2>
+El universo es enorme...
+pero qué suerte que coincidimos.
+✨
+</h2>
+
+</footer>
+
+<script>
+
+const stars = document.getElementById("stars");
+
+for(let i=0;i<200;i++){
+
+const star=document.createElement("div");
+
+star.className="star";
+
+const size=Math.random()*3;
+
+star.style.width=size+"px";
+star.style.height=size+"px";
+
+star.style.left=Math.random()*100+"%";
+star.style.top=Math.random()*100+"%";
+
+star.style.animationDelay=Math.random()*5+"s";
+
+stars.appendChild(star);
+}
+
+function createBalloon(){
+
+const balloon=document.createElement("img");
+
+balloon.className="balloon";
+
+balloon.src="https://cdn-icons-png.flaticon.com/512/744/744465.png";
+
+balloon.style.left=Math.random()*100+"vw";
+
+balloon.style.width=(50+Math.random()*50)+"px";
+
+balloon.style.animationDuration=
+(15+Math.random()*10)+"s";
+
+document.body.appendChild(balloon);
+
+setTimeout(()=>{
+balloon.remove();
+},25000);
+
+}
+
+setInterval(createBalloon,1200);
+
+function showMessage(){
+
+alert(`
+Para la persona que convirtió
+mi mundo en una aventura.
+
+Gracias por existir ❤️
+`);
+
+}
+
+document.addEventListener("mousemove",(e)=>{
+
+if(Math.random()>.85){
+
+const heart=document.createElement("div");
+
+heart.className="heart";
+
+heart.innerHTML="❤️";
+
+heart.style.left=e.pageX+"px";
+heart.style.top=e.pageY+"px";
+
+document.body.appendChild(heart);
+
+setTimeout(()=>{
+heart.remove();
+},5000);
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
